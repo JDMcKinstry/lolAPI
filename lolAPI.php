@@ -232,12 +232,12 @@
 		 *	@return ARRAY "masteries" Get mastery pages mapped by summoner ID for a given list of summoner IDs
 		 *	@return ARRAY "runes" Get rune pages mapped by summoner ID for a given list of summoner IDs
 		 */
-		public function summoner($id, $subKey, $data=NULL, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('static-data', $id, $subKey, $region, $version), $data); }
+		public function summoner($id, $subKey, $data=NULL, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('summoner', $id, $subKey, $region, $version), $data); }
 		
 		/**	champion(long $id, string $region, string $version)
 		 *	@return ARRAY Retrieves teams for given summoner ID
 		 */
-		public function team($id, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('game', $id, NULL, $region, $version)); }
+		public function team($id, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('team', $id, NULL, $region, $version)); }
 		
 		/*	Methods:Private:Utility	*/
 		private function formatResult($ch, $response) {
