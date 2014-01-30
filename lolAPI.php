@@ -103,7 +103,7 @@
 		 *	@return ARRAY Results from CURL call
 		 */
 		public function callAPI($url, $data=array()) {
-			$query = '?api_key=' . $this->API_KEY;
+			$query = '?api_key=' . $this->apiKey;
 			if (!empty($data)) $query .= '&' . (is_array($data) ? http_build_query($data) : $data);
 			
 			if (!empty($url)) {
