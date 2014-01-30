@@ -5,7 +5,7 @@ A simple PHP Class for interacting with Riot's LoL REST API found @ https://deve
 
 Thus far, the class has 2 simple parts. The first is a set of functions simply for making a correct link and using CURL to submit that link. The second is just a set of methods that refelect the different REST calls, with some parameters that make using the previously mentioned functions much easier.
 
-ONLY ONE FILE NEEDED! -> https://github.com/JDMcKinstry/lolAPI/blob/master/lolAPI.php
+ONLY ONE FILE NEEDED! -> https://raw.github.com/JDMcKinstry/lolAPI/master/lolAPI.php
 
 ¡IMPORTANT!
 =
