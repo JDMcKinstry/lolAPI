@@ -7,13 +7,13 @@ Thus far, the class has 2 simple parts. The first is a set of functions simply f
 
 ONLY ONE FILE NEEDED! -> https://raw.github.com/JDMcKinstry/lolAPI/master/lolAPI.php
 
+***More coming soon!***
+
 ¡IMPORTANT!
 =
 You have the option to set your API KEY permnently to your file. Simply open the `lolAPI` class in an editor and look for `/*	Init Construction	*/` at the very top. Simply set your API KEY in the quotes by `const API_KEY = '';`. 
 
 Keep in mind, this step is optional, however, if you do not do this, then every time you call a new instance of the class, you will be required to provide you `RIOT LoL API KEY`.
-
-***More coming soon!***
 
 EXAMPLES (*Basic Methods*)
 =
