@@ -13,6 +13,8 @@ You have the option to set your API KEY permnently to your file. Simply open the
 
 Keep in mind, this step is optional, however, if you do not do this, then every time you call a new instance of the class, you will be required to provide you `RIOT LoL API KEY`.
 
+***More coming soon!***
+
 EXAMPLES (*Basic Methods*)
 =
 
