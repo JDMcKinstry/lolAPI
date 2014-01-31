@@ -88,6 +88,55 @@
 			503 => 'Internal server error'
 		);
 		
+		private $gameModes = array(
+			'CLASSIC' => "Classic Summoner's Rift and Twisted Treeline games",
+			'ODIN' => 'Dominion/Crystal Scar games',
+			'ARAM' => 'ARAM games',
+			'TUTORIAL' => 'Tutorial games',
+			'ONEFORALL' => 'One for All games',
+			'FIRSTBLOOD' => 'Snowdown Showdown games'
+		);
+		
+		private $gameTypes = array(
+			'base' => array(
+				'CUSTOM_GAME' => 'Custom games',
+				'TUTORIAL_GAME' => 'Tutorial games',
+				'MATCHED_GAME' => 'All other games',
+			),
+			'sub' => array(
+				'NONE' => 'Custom games',
+				'NORMAL' => "Summoner's Rift unranked games",
+				'NORMAL_3x3' => 'Twisted Treeline unranked games',
+				'ODIN_UNRANKED' => 'Dominion/Crystal Scar games',
+				'ARAM_UNRANKED_5x5' => 'ARAM / Howling Abyss games',
+				'BOT' => "Summoner's Rift and Crystal Scar games played against AI",
+				'BOT_3x3' => 'Twisted Treeline games played against AI',
+				'RANKED_SOLO_5x5' => "Summoner's Rift ranked solo queue games",
+				'RANKED_TEAM_3x3' => 'Twisted Treeline ranked team games',
+				'RANKED_TEAM_5x5' => "Summoner's Rift ranked team games",
+				'ONEFORALL_5x5' => 'One for All games',
+				'FIRSTBLOOD_1x1' => 'Snowdown Showdown 1x1 games',
+				'FIRSTBLOOD_2x2' => 'Snowdown Showdown 2x2 games'
+			)
+		);
+		
+		private $maps = array(
+			1 => array( 'name' => "Summoner's Rift", 'notes' => 'Summer Variant' ),
+			2 => array( 'name' => "Summoner's Rift", 'notes' => 'Autumn Variant' ),
+			3 => array( 'name' => 'The Proving Grounds', 'notes' => 'Tutorial Map' ),
+			4 => array( 'name' => 'Twisted Treeline', 'notes' => 'Original Version' ),
+			8 => array( 'name' => 'The Crystal Scar', 'notes' => 'Dominion Map' ),
+			10 => array( 'name' => 'Twisted Treeline', 'notes' => 'Current Version' ),
+			12 => array( 'name' => 'Howling Abyss', 'notes' => 'ARAM Map' )
+		);
+		
+		private $runeSlots = array(
+			'glyphs' => array( 19, 20, 21, 22, 23, 24, 25, 26, 27 ),
+			'marks' => array( 1, 2, 3, 4, 5, 6, 7, 8, 9 ),
+			'quints' => array( 28, 29, 30 ),
+			'seals' => array( 10, 11, 12, 13, 14, 15, 16, 17, 18 )
+		);
+		
 		private $regions = array(	//	BR, EUNE, EUW, KR, LAN, LAS, NA, OCE, RU, TR
 			'br' => 'Brazil',
 			'eune' => 'Eastern Europe',
@@ -245,24 +294,47 @@
 		public function team($id, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('team', $id, NULL, $region, $version)); }
 		
 		/*	Methods:Public:DataDragonDirect [DOES NOT COUNT TOWARD RATE LIMIT]	*/
-		private $dataDragonNfo = array(
-			'locale' => 'en_US',
-			'url' => 'http://ddragon.leagueoflegends.com/cdn/{version}/data/{locale}',
-			'ver' => '4.1.2'
-		);
-		private function buildDDUrl($method, $loc, $ver) {
-			if (empty($loc)) $loc = $this->dataDragonNfo['locale'];
-			if (empty($ver)) $ver = $this->dataDragonNfo['ver'];
-			$url = str_replace('{locale}', $loc, $this->dataDragonNfo['url']);
-			return str_replace('{version}', $ver, $url) . "/$method";
+		public function getDDUrl($method, $region=NULL) {
+			if (!key_exists($region, $this->regions)) $region = self::getRegion($region);
+			if (is_string($method) && key_exists($region, $this->regions)) {
+				$nfo = self::ddGetNfo($region, TRUE);
+				$url = sprintf('%s/%s/data/%s/%s', $nfo['cdn'], $nfo['v'], $nfo['l'], $method);
+				return $url;
+			}
+			return FALSE;
 		}
-		/**	ddChampionJSON();
+		
+		/**	ddGetNfo();
 		 */
-		public function ddChampionJSON($locale=NULL, $version=NULL) {
+		public function ddGetNfo($reg=NULL, $justResponse=FALSE) {
+			if (empty($reg)) $reg = self::getRegion();
 			$curlOpts = array(
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::buildDDUrl('champion.json', $locale, $version),
+				CURLOPT_URL => "http://ddragon.leagueoflegends.com/realms/$reg.json",
+				CURLOPT_VERBOSE => 1
+			);
+			
+			$ch = curl_init($url);
+			curl_setopt_array($ch, $curlOpts);
+			$response = curl_exec($ch);
+			$result = $this->formatResult($ch, $response);
+			curl_close($ch);
+			
+			if ($justResponse) {
+				$this->result = $result;
+				if (key_exists('status', $result)) if ($result['status'] == 'SUCCESS') return $result['response'];
+			}
+			return $result;
+		}
+		
+		/**	ddChampionJSON();
+		 */
+		public function ddChampionJSON($region=NULL) {
+			$curlOpts = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 3,
+				CURLOPT_URL => self::getDDUrl('champion.json', $region),
 				CURLOPT_VERBOSE => 1
 			);
 			
@@ -277,18 +349,18 @@
 		
 		/**	ddItemJSON();
 		 */
-		public function ddItemJSON($locale=NULL, $version=NULL) {
+		public function ddItemJSON($region=NULL) {
 			$curlOpts = array(
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::buildDDUrl('item.json', $locale, $version),
+				CURLOPT_URL => self::getDDUrl('item.json', $region),
 				CURLOPT_VERBOSE => 1
 			);
 			
 			$ch = curl_init($url);
 			curl_setopt_array($ch, $curlOpts);
 			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response);
+			$result = $this->formatResult($ch, $response, $region);
 			curl_close($ch);
 			
 			return $this->result = $result;
@@ -296,11 +368,11 @@
 		
 		/**	ddMasteryJSON();
 		 */
-		public function ddMasteryJSON($locale=NULL, $version=NULL) {
+		public function ddMasteryJSON($region=NULL) {
 			$curlOpts = array(
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::buildDDUrl('mastery.json', $locale, $version),
+				CURLOPT_URL => self::getDDUrl('mastery.json', $region),
 				CURLOPT_VERBOSE => 1
 			);
 			
@@ -315,11 +387,11 @@
 		
 		/**	ddRuneJSON();
 		 */
-		public function ddRuneJSON($locale=NULL, $version=NULL) {
+		public function ddRuneJSON($region=NULL) {
 			$curlOpts = array(
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::buildDDUrl('rune.json', $locale, $version),
+				CURLOPT_URL => self::getDDUrl('rune.json', $region),
 				CURLOPT_VERBOSE => 1
 			);
 			
@@ -334,11 +406,11 @@
 		
 		/**	ddSummonerJSON();
 		 */
-		public function ddSummonerJSON($locale=NULL, $version=NULL) {
+		public function ddSummonerJSON($region=NULL) {
 			$curlOpts = array(
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::buildDDUrl('summoner.json', $locale, $version),
+				CURLOPT_URL => self::getDDUrl('summoner.json', $region),
 				CURLOPT_VERBOSE => 1
 			);
 			
