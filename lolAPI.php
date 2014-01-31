@@ -209,7 +209,7 @@
 		 */
 		public function league($id, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('league', $id, NULL, $region, $version)); }
 		
-		/**	champion(long $id, string $region, string $version)
+		/**	staticData(long $id, string $region, string $version)  [DOES NOT COUNT TOWARD RATE LIMIT]
 		 *	@return ARRAY "champion" Retrieves champion list.
 		 *	@return ARRAY "champion/{id}" Retrieves a champion by its id.
 		 *	@return ARRAY "item" Retrieves item list.
@@ -224,13 +224,13 @@
 		 */
 		public function staticData($subKey, $id=NULL, $data=NULL, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('static-data', $id, $subKey, $region, $version), $data); }
 		
-		/**	champion(long $id, string $region, string $version)
+		/**	stats(long $id, string $region, string $version)
 		 *	@return ARRAY "summary" Get player stats summaries by summoner ID. One summary is returned per queue type.
 		 *	@return ARRAY "ranked" Get ranked stats by summoner ID. Includes statistics for Twisted Treeline and Summoner's Rift.
 		 */
 		public function stats($id, $subKey, $data=NULL, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('stats', $id, $subKey, $region, $version), $data); }
 		
-		/**	champion(long $id, string $region, string $version)
+		/**	summoner(long $id, string $region, string $version)
 		 *	@return ARRAY "by-id" Get summoner objects mapped by summoner ID for a given list of summoner IDs
 		 *	@return ARRAY "by-name" Get summoner objects mapped by standardized summoner name for a given list of summoner names 
 		 *	@return ARRAY "name" Get summoner names mapped by summoner ID for a given list of summoner IDs
@@ -243,6 +243,113 @@
 		 *	@return ARRAY Retrieves teams for given summoner ID
 		 */
 		public function team($id, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('team', $id, NULL, $region, $version)); }
+		
+		/*	Methods:Public:DataDragonDirect [DOES NOT COUNT TOWARD RATE LIMIT]	*/
+		private $dataDragonNfo = array(
+			'locale' => 'en_US',
+			'url' => 'http://ddragon.leagueoflegends.com/cdn/{version}/data/{locale}',
+			'ver' => '4.1.2'
+		);
+		private function buildDDUrl($method, $loc, $ver) {
+			if (empty($loc)) $loc = $this->dataDragonNfo['locale'];
+			if (empty($ver)) $ver = $this->dataDragonNfo['ver'];
+			$url = str_replace('{locale}', $loc, $this->dataDragonNfo['url']);
+			return str_replace('{version}', $ver, $url) . "/$method";
+		}
+		/**	ddChampionJSON();
+		 */
+		public function ddChampionJSON($locale=NULL, $version=NULL) {
+			$curlOpts = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 3,
+				CURLOPT_URL => self::buildDDUrl('champion.json', $locale, $version),
+				CURLOPT_VERBOSE => 1
+			);
+			
+			$ch = curl_init($url);
+			curl_setopt_array($ch, $curlOpts);
+			$response = curl_exec($ch);
+			$result = $this->formatResult($ch, $response);
+			curl_close($ch);
+			
+			return $this->result = $result;
+		}
+		
+		/**	ddItemJSON();
+		 */
+		public function ddItemJSON($locale=NULL, $version=NULL) {
+			$curlOpts = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 3,
+				CURLOPT_URL => self::buildDDUrl('item.json', $locale, $version),
+				CURLOPT_VERBOSE => 1
+			);
+			
+			$ch = curl_init($url);
+			curl_setopt_array($ch, $curlOpts);
+			$response = curl_exec($ch);
+			$result = $this->formatResult($ch, $response);
+			curl_close($ch);
+			
+			return $this->result = $result;
+		}
+		
+		/**	ddMasteryJSON();
+		 */
+		public function ddMasteryJSON($locale=NULL, $version=NULL) {
+			$curlOpts = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 3,
+				CURLOPT_URL => self::buildDDUrl('mastery.json', $locale, $version),
+				CURLOPT_VERBOSE => 1
+			);
+			
+			$ch = curl_init($url);
+			curl_setopt_array($ch, $curlOpts);
+			$response = curl_exec($ch);
+			$result = $this->formatResult($ch, $response);
+			curl_close($ch);
+			
+			return $this->result = $result;
+		}
+		
+		/**	ddRuneJSON();
+		 */
+		public function ddRuneJSON($locale=NULL, $version=NULL) {
+			$curlOpts = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 3,
+				CURLOPT_URL => self::buildDDUrl('rune.json', $locale, $version),
+				CURLOPT_VERBOSE => 1
+			);
+			
+			$ch = curl_init($url);
+			curl_setopt_array($ch, $curlOpts);
+			$response = curl_exec($ch);
+			$result = $this->formatResult($ch, $response);
+			curl_close($ch);
+			
+			return $this->result = $result;
+		}
+		
+		/**	ddSummonerJSON();
+		 */
+		public function ddSummonerJSON($locale=NULL, $version=NULL) {
+			$curlOpts = array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 3,
+				CURLOPT_URL => self::buildDDUrl('summoner.json', $locale, $version),
+				CURLOPT_VERBOSE => 1
+			);
+			
+			$ch = curl_init($url);
+			curl_setopt_array($ch, $curlOpts);
+			$response = curl_exec($ch);
+			$result = $this->formatResult($ch, $response);
+			curl_close($ch);
+			
+			return $this->result = $result;
+		}
 		
 		/*	Methods:Private:Utility	*/
 		private function formatResult($ch, $response) {
