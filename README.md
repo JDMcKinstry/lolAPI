@@ -11,6 +11,9 @@ ONLY ONE FILE NEEDED! -> https://raw.github.com/JDMcKinstry/lolAPI/master/lolAPI
 
 **Updating the Class** -> This should be relativly simple. As you'll notice when you look at the class, the top section is labeled `/*	Init Construction	*/`. Here is where you can adjust the "*Rate Limits*" for a piece I'm working on which will keep you from *overcalling*. 75+% of updating will simply be in the property `private $apiUrls`. Simply add, or update links as needed and version numbers. Only the latest version number is needed, however, through params, programmers can easily make use of older versions if needed. The rest may simply be writting a new "simple" method if new methods are added to the REST API. This simple maintenance plan makes adding this to any other "extended" LoL API Library or even direct interface easy to update and maintain. The rest of your work is up to you!
 
+*Update 01/31/2014 1500* After making more use of this myself, I decided to incorporate some simple methods for getting JSON data from Data Dragon. For now, all that's needed to maintain it is to update the variable `private (array) $dataDragonNfo`.
+
+
 ***More coming soon!***
 
 ¡IMPORTANT!
@@ -65,3 +68,15 @@ EXAMPLES (*LoL REST Methods*)
 	//	it has plenty of "subkeys", all added to method comment for ease of use in IDE's
 	$lolAPI->staticData('champion', $id);
 	//	don't forget you can include query data as an array (OptionaL 3rd param) 
+
+
+EXAMPLES (*Data Dragon*)
+=
+
+	$x = new lolAPI();
+	
+	$ddChampion = $x->ddChampionJSON();
+	$ddItem = $x->ddItemJSON();
+	$ddMastery = $x->ddMasteryJSON();
+	$ddRune = $x->ddRuneJSON();
+	$ddSummoner = $x->ddSummonerJSON();
