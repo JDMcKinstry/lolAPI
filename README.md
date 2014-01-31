@@ -1,7 +1,9 @@
 lolAPI
 =
 
-A simple PHP Class for interacting with Riot's LoL REST API found @ https://developer.riotgames.com
+A simple PHP Class for interacting with Riot's LoL REST API found @ https://developer.riotgames.com.
+
+*It should be noted, this is not yet intended to be a "complete library", but rather a simple and easy to update class that allows ease of use to Riot's LoL REST API, thus allowing the programmer "Freedom" to create.*
 
 Thus far, the class has 2 simple parts. The first is a set of functions simply for making a correct link and using CURL to submit that link. The second is just a set of methods that refelect the different REST calls, with some parameters that make using the previously mentioned functions much easier.
 
