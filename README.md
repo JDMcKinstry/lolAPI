@@ -9,6 +9,8 @@ Thus far, the class has 2 simple parts. The first is a set of functions simply f
 
 ONLY ONE FILE NEEDED! -> https://raw.github.com/JDMcKinstry/lolAPI/master/lolAPI.php
 
+**Updating the Class** -> This should be relativly simple. As you'll notice when you look at the class, the top section is labeled `/*	Init Construction	*/`. Here is where you can adjust the "*Rate Limits*" for a piece I'm working on which will keep you from *overcalling*. 75+% of updating will simply be in the property `private $apiUrls`. Simply add, or update links as needed and version numbers. Only the latest version number is needed, however, through params, programmers can easily make use of older versions if needed. The rest may simply be writting a new "simple" method if new methods are added to the REST API. This simple maintenance plan makes adding this to any other "extended" LoL API Library or even direct interface easy to update and maintain. The rest of your work is up to you!
+
 ***More coming soon!***
 
 ¡IMPORTANT!
