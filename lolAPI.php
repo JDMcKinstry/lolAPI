@@ -12,8 +12,13 @@
 	 */
 	class lolAPI {
 		/*	Init Construction	*/
-		const API_KEY = '';
+		const API_KEY = 'e8f00592-d376-45e9-bd54-dac78ab66e06';
 		private $apiKey;
+		private $rateLimits = array(
+			'opm' => 10,	//	offset per minute
+			'rpm' => 50,	//	request per minute
+			'rps' => 1		//	request per second
+		);
 		function __construct($apiKey=self::API_KEY) {
 			$this->apiKey = $apiKey;
 			if (empty($this->apiKey)) return "Please provide an API Key.";
@@ -302,4 +307,33 @@
 		}
 		
 	}
+	
+	/*	NOTES	*/
+	/*
+		
+		champion - *freeToPlay
+		game - **summonerID
+		league - **summonerID
+		
+		static-data-champion - **champID, *champData[ 'all', 'image', 'skins', 'lore', 'blurb', 'allytips', 'enemytips', 'tags', 'partype', 'info', 'stats', 'spells', 'passive', 'recommended' ]
+		static-data-item - **itemID, *itemData[ 'all', 'description', 'colloq', 'into', 'image', 'gold', 'tags', 'stats' ]
+		static-data-mastery - **itemID, *locale[ 'en_US', 'es_ES' ], *version, *masteryData[ 'all', 'ranks', 'prereq', 'image' ]
+		static-data-realm - 
+		static-data-rune - **runeID, *locale[ 'en_US', 'es_ES' ], *version, *runeData[ 'all', 'image', 'stats', 'tags', 'colloq', 'plaintext' ]
+		static-data-spell - **spellID, *locale[ 'en_US', 'es_ES' ], *version, *spellData[ 'all', 'key', 'image', 'tooltip', 'resource', 'maxrank', 'modes', 'costType', 'cost', 'costBurn', 'range', 'rangeBurn', 'effect', 'effectBurn', 'cooldown', 'cooldownBurn', 'vars' ]
+		
+		stats-summary - **summonerID, season[ 'SEASON3', 'SEASON4' ]
+		stats-ranked - **summonerID, season[ 'SEASON3', 'SEASON4' ]
+		
+		{Comma-separated list of summoner Names/IDs to retrieve. Maximum allowed at once is 40.}
+		summoner-by_id - **summonerID
+		summoner-by_name - **summonerName
+		summoner-masteries - **summonerID
+		summoner-runes - **summonerID
+		summoner-name - **summonerID
+		
+		team - **summonerID
+		
+	*/
+	
 ?>
