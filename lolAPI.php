@@ -12,7 +12,7 @@
 	 */
 	class lolAPI {
 		/*	Init Construction	*/
-		const API_KEY = 'e8f00592-d376-45e9-bd54-dac78ab66e06';
+		const API_KEY = '';
 		private $apiKey;
 		private $rateLimits = array(
 			'opm' => 10,	//	offset per minute
