@@ -176,6 +176,7 @@
 				
 				return $this->result = $result;
 			}
+			return FALSE;
 		}
 		
 		/**	getRegions([bool $fullNames]);
@@ -196,7 +197,7 @@
 				if (key_exists($value, $this->regions)) return $this->regions[$value];
 				if ($strict) {
 					$key = array_search($value, array_map('strtolower',$this->regions));
-					return is_string($key) ? $key : FALSE;
+					return is_string($key) ? $key : self::getRegion('North America');
 				}
 				else $value = strtolower($value);
 				$key = array_search($value, array_map('strtolower',$this->regions)); 
@@ -207,7 +208,6 @@
 					similar_text(strtolower($v), $value, $vPerc);
 					if ($vPerc >= 90) return $k;
 				}
-				return FALSE;
 			}
 			return self::getRegion('North America');
 		}
@@ -294,134 +294,70 @@
 		public function team($id, $region=NULL, $version=NULL) { return self::callAPI(self::getUrl('team', $id, NULL, $region, $version)); }
 		
 		/*	Methods:Public:DataDragonDirect [DOES NOT COUNT TOWARD RATE LIMIT]	*/
-		public function getDDUrl($method, $region=NULL) {
+		const DATADRAGON_URL = "http://ddragon.leagueoflegends.com/realms/{region}.json";
+		public function callDataDragon($url, $region=NULL) {
+			if (empty($region)) $region = self::getRegion();
+			
+			if (!empty($url)) {
+				$curlOpts = array(
+					CURLOPT_RETURNTRANSFER => 1,
+					CURLOPT_TIMEOUT => 3,
+					CURLOPT_URL => $url,
+					CURLOPT_VERBOSE => 1
+				);
+				
+				$ch = curl_init($url);
+				curl_setopt_array($ch, $curlOpts);
+				$response = curl_exec($ch);
+				$result = $this->formatResult($ch, $response);
+				curl_close($ch);
+				
+				return $this->result = $result;
+			}
+			return FALSE;
+		}
+		
+		public function getUrlDataDragon($method, $region=NULL) {
+			if (is_null($region)) $region = self::getRegion($region);
 			if (!key_exists($region, $this->regions)) $region = self::getRegion($region);
+			echo($region);
 			if (is_string($method) && key_exists($region, $this->regions)) {
 				$nfo = self::ddGetNfo($region, TRUE);
-				$url = sprintf('%s/%s/data/%s/%s', $nfo['cdn'], $nfo['v'], $nfo['l'], $method);
-				return $url;
+				if (key_exists('status', $nfo))
+					if ($nfo['status'] == "SUCCESS" && key_exists('response', $nfo))
+						if (!empty($nfo['response']['cdn']) && !empty($nfo['response']['v']) && !empty($nfo['response']['l']))
+							return sprintf('%s/%s/data/%s/%s', $nfo['response']['cdn'], $nfo['response']['v'], $nfo['response']['l'], $method);
 			}
 			return FALSE;
 		}
 		
 		/**	ddGetNfo();
 		 */
-		public function ddGetNfo($reg=NULL, $justResponse=FALSE) {
-			if (empty($reg)) $reg = self::getRegion();
-			$curlOpts = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => "http://ddragon.leagueoflegends.com/realms/$reg.json",
-				CURLOPT_VERBOSE => 1
-			);
-			
-			$ch = curl_init($url);
-			curl_setopt_array($ch, $curlOpts);
-			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response);
-			curl_close($ch);
-			
-			if ($justResponse) {
-				$this->result = $result;
-				if (key_exists('status', $result)) if ($result['status'] == 'SUCCESS') return $result['response'];
-			}
-			return $result;
+		public function ddGetNfo($region=NULL, $justResponse=FALSE) {
+			if (empty($region)) $region = self::getRegion();
+			$url = str_replace('{region}', $region, self::DATADRAGON_URL);
+			return self::callDataDragon($url);
 		}
 		
 		/**	ddChampionJSON();
 		 */
-		public function ddChampionJSON($region=NULL) {
-			$curlOpts = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::getDDUrl('champion.json', $region),
-				CURLOPT_VERBOSE => 1
-			);
-			
-			$ch = curl_init($url);
-			curl_setopt_array($ch, $curlOpts);
-			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response);
-			curl_close($ch);
-			
-			return $this->result = $result;
-		}
+		public function ddChampionJSON($region=NULL) { return self::callDataDragon(self::getUrlDataDragon('champion.json', $region), $region); }
 		
 		/**	ddItemJSON();
 		 */
-		public function ddItemJSON($region=NULL) {
-			$curlOpts = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::getDDUrl('item.json', $region),
-				CURLOPT_VERBOSE => 1
-			);
-			
-			$ch = curl_init($url);
-			curl_setopt_array($ch, $curlOpts);
-			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response, $region);
-			curl_close($ch);
-			
-			return $this->result = $result;
-		}
+		public function ddItemJSON($region=NULL) { return self::callDataDragon(self::getUrlDataDragon('item.json', $region), $region); }
 		
 		/**	ddMasteryJSON();
 		 */
-		public function ddMasteryJSON($region=NULL) {
-			$curlOpts = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::getDDUrl('mastery.json', $region),
-				CURLOPT_VERBOSE => 1
-			);
-			
-			$ch = curl_init($url);
-			curl_setopt_array($ch, $curlOpts);
-			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response);
-			curl_close($ch);
-			
-			return $this->result = $result;
-		}
+		public function ddMasteryJSON($region=NULL) { return self::callDataDragon(self::getUrlDataDragon('mastery.json', $region), $region); }
 		
 		/**	ddRuneJSON();
 		 */
-		public function ddRuneJSON($region=NULL) {
-			$curlOpts = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::getDDUrl('rune.json', $region),
-				CURLOPT_VERBOSE => 1
-			);
-			
-			$ch = curl_init($url);
-			curl_setopt_array($ch, $curlOpts);
-			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response);
-			curl_close($ch);
-			
-			return $this->result = $result;
-		}
+		public function ddRuneJSON($region=NULL) { return self::callDataDragon(self::getUrlDataDragon('rune.json', $region), $region); }
 		
 		/**	ddSummonerJSON();
 		 */
-		public function ddSummonerJSON($region=NULL) {
-			$curlOpts = array(
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 3,
-				CURLOPT_URL => self::getDDUrl('summoner.json', $region),
-				CURLOPT_VERBOSE => 1
-			);
-			
-			$ch = curl_init($url);
-			curl_setopt_array($ch, $curlOpts);
-			$response = curl_exec($ch);
-			$result = $this->formatResult($ch, $response);
-			curl_close($ch);
-			
-			return $this->result = $result;
-		}
+		public function ddSummonerJSON($region=NULL) { return self::callDataDragon(self::getUrlDataDragon('summoner.json', $region), $region); }
 		
 		/*	Methods:Private:Utility	*/
 		private function formatResult($ch, $response) {
@@ -514,5 +450,4 @@
 		team - **summonerID
 		
 	*/
-	
 ?>
