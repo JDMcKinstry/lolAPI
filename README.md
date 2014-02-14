@@ -13,6 +13,9 @@ ONLY ONE FILE NEEDED! -> https://raw.github.com/JDMcKinstry/lolAPI/master/lolAPI
 
 *Update 01/31/2014 1500* After making more use of this myself, I decided to incorporate some simple methods for getting JSON data from Data Dragon. For now, all that's needed to maintain it is to update the variable `private (array) $dataDragonNfo`.
 
+*Coming Soon*
+ - Rate Limiting
+
 Requires CURL
 =
 Make sure you have curl enabled. If you don't know how to enable curl, try the following resources.
