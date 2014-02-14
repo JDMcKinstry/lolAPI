@@ -20,6 +20,12 @@ ONLY ONE FILE NEEDED! -> https://raw.github.com/JDMcKinstry/lolAPI/master/lolAPI
 =
 You have the option to set your API KEY permnently to your file. Simply open the `lolAPI` class in an editor and look for `/*	Init Construction	*/` at the very top. Simply set your API KEY in the quotes by `const API_KEY = '';`. 
 
+	class lolAPI {
+		/*	Init Construction	*/
+		const API_KEY = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+
+|OR|
+
 Keep in mind, this step is optional, however, if you do not do this, then every time you call a new instance of the class, you will be required to provide your `RIOT LoL API KEY` everytime you establish new instance, such as:
 
 	$lolAPI = new lolAPI('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
